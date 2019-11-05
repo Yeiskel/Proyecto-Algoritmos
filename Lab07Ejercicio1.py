@@ -1,4 +1,5 @@
 #
+# Hello
 # Autor: Yeiskel Cisneros
 # Lab07Ejercicio1.py
 # DESCRIPCION: Un programa que dado un arreglo de enteros S de tamaño N y
