@@ -7,11 +7,14 @@
         Gerardo Carrillo 
         Yeiskel Cisneros
     
-    Última modificacion: 18/11/19
+    Última modificacion: 20/11/19
 """
 
 import pygame
 import sys
+
+def dibujar_menu():
+    pygame.draw.rect(screen,GRAY,(200,200,200,200),0)
 
 def inicializar_tablero(empezar_partida:str)->'list':
     if empezar_partida== "S":
@@ -56,9 +59,13 @@ def dibujar_tablero(tablero):
         #Coordenadas graficas del tablero
         texto = Fuente.render(letras[f], True, WHITE)
         texto2 = Fuente.render(str(n), True, WHITE)
-        screen.blit(texto, [f*TAMAÑO_CUADRO + 5,2])
+        screen.blit(texto, [f*TAMAÑO_CUADRO + 20,15])
+        screen.blit(texto, [(f*TAMAÑO_CUADRO) + 20, 550])
+
         if f!= 0:
-            screen.blit(texto2,[5,f*TAMAÑO_CUADRO +5])
+            screen.blit(texto2,[25,f*TAMAÑO_CUADRO +10])
+            screen.blit(texto2,[560,f*TAMAÑO_CUADRO +10])
+            
         n += 1
     pygame.display.update()
 
@@ -122,7 +129,7 @@ TOTAL_CASILLAS = FICHAS_INICIALES + 60
 
 
 
-Fuente = pygame.font.SysFont('Helvetica', 20, 5)
+Fuente = pygame.font.SysFont('Helvetica', 30, 5)
 screen = pygame.display.set_mode(TAMAÑO)
 
 # Todas las patidas que se quieran jugar 
