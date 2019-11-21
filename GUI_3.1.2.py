@@ -14,7 +14,7 @@ import pygame
 import sys
 
 def dibujar_menu():
-    TAMAÑO_MENU = (250,250)
+    TAMAÑO_MENU = (500,500)
     screen_menu= pygame.display.set_mode(TAMAÑO_MENU)
     over = False
     
