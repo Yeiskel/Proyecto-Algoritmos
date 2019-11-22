@@ -20,28 +20,30 @@ def dibujar_menu():
     while not over:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                over=True 
+                over=True
+                #pygame.quit()
+                #quit()
+            
         pygame.draw.rect(screen, GRAY,(300,150,300,300),0)
         
         
         #Boton de Jugar
-        boton("Jugar",400,250,100,50,BLACK, GREEN,"Jugar")
+        boton("Jugar",400,250,100,50,BLACK, GREEN,juego_completo)
+
         #Boton de Salir
-        boton("Salir", 400, 350, 100, 50, BLACK, GREEN)
+        boton("Salir", 400, 350, 100, 50, BLACK, GREEN,quit)
        
 
         pygame.display.update()
-
+#Crea un boton con funcionabilidad 
 def boton(mensaje:str, x:int, y:int, ancho:int, alto:int, color_activo:tuple, color_inactivo:tuple, comando=None):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
-    print(click)
+
     if x + ancho > mouse[0] > x and y + alto > mouse[1] > y:
             pygame.draw.rect(screen, color_activo, (x,y,ancho,alto),0)
             if click[0] == 1 and comando != None:
-                if comando == "Jugar":
-                    pass #acá necesito llamar a todo el juego
-
+                comando() 
 
     else:
             pygame.draw.rect(screen, color_inactivo, (x,y,ancho,alto),0)
@@ -56,17 +58,15 @@ def cuadros_texto(texto:str, fuente):
     return textscreen, textscreen.get_rect()
     
 
-def inicializar_tablero(empezar_partida:str)->'list':
-    if empezar_partida== "S":
+def inicializar_tablero()->'list':
+    
 
-        tablero= [[0 for i in range (0,10)] for j in range(0,10)]    # Creacion del tablero de 8x8 sin fichas
-        # Fichas iniciales
-        tablero[4][4] = tablero[5][5] = 1
-        tablero[5][4] = tablero[4][5] = 2
-        return(tablero)
-    else:
-        print("\nHasta luego ")
-        sys.exit()
+    tablero= [[0 for i in range (0,10)] for j in range(0,10)]    # Creacion del tablero de 8x8 sin fichas
+    # Fichas iniciales
+    tablero[4][4] = tablero[5][5] = 1
+    tablero[5][4] = tablero[4][5] = 2
+    return(tablero)
+    
 
 def visualizacion_tablero(copia_tablero:[int])->list:    
     copia_tablero = ""
@@ -140,51 +140,11 @@ def resultados(tablero:list)->str:
     else:
         print("\nEmpate")
 
-
-while True:
-    try:
-        empezar_partida = input("¿Desea Jugar? \n(S/N): ")
-        empezar_partida = empezar_partida.upper()
-        assert(empezar_partida=="S" or empezar_partida=="N")
-        break
-    except: 
-        print("Entrada no valida. Intente nuevamente")
-    
-
-tablero = inicializar_tablero(empezar_partida)
-print(visualizacion_tablero(tablero))
-  
-pygame.init()
-
-
-# CONSTANTES INICIALIZADAS 
-TAMAÑO_CUADRO = 60  
-GREEN =(67,160,71)      
-BLUE = (42,17,204)                            # Color del borde de los cuadros en el tablero
-GRAY = (52,73,94)                        # Color de fondo del tablero
-WHITE = (255, 255, 255)                     # Color de las fichas del jugador 1
-BLACK =(0,0,0)                              # Color de las fichas del jugador 2
-ANCHO = (10 * TAMAÑO_CUADRO) + 300
-ALTO = 10 * TAMAÑO_CUADRO
-TAMAÑO = (ANCHO, ALTO)                      # Tamaño en pixeles del tablero
-FICHAS_INICIALES = 4                        # Numero de fichas al inicio del juego
-TOTAL_CASILLAS = FICHAS_INICIALES + 60
-
-
-Fuente = pygame.font.SysFont('Helvetica', 30, 5)
-screen = pygame.display.set_mode(TAMAÑO)
-
-# Primero aparece el menu
-dibujar_menu()
-
-
-# Ahora aparece el resto del juego
-# Todas las patidas que se quieran jugar 
-while empezar_partida=="S":
-    game_over = False                              
-    turno = 0
+def juego_completo():
+    game_over = False          
+    turno = 0                    
     contador_ficha = FICHAS_INICIALES
-    tablero = inicializar_tablero(empezar_partida)
+    tablero = inicializar_tablero()
     dibujar_tablero(tablero)
     pygame.display.update()
     
@@ -197,8 +157,8 @@ while empezar_partida=="S":
             #for event in pygame.event.get():
             event= pygame.event.wait()
             if event.type == pygame.QUIT:
-                game_over=True
-                sys.exit()
+                pygame.quit()
+                quit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     sys.exit()
@@ -255,6 +215,49 @@ while empezar_partida=="S":
             break
         except:
             print("Entrada invalida. Intente nuevamente")
+"""
+while True:
+    try:
+        empezar_partida = input("¿Desea Jugar? \n(S/N): ")
+        empezar_partida = empezar_partida.upper()
+        assert(empezar_partida=="S" or empezar_partida=="N")
+        break
+    except: 
+        print("Entrada no valida. Intente nuevamente")
+"""    
+
+tablero = inicializar_tablero()
+print(visualizacion_tablero(tablero))
+  
+pygame.init()
+
+
+# CONSTANTES INICIALIZADAS 
+TAMAÑO_CUADRO = 60  
+GREEN =(67,160,71)      
+BLUE = (42,17,204)                            # Color del borde de los cuadros en el tablero
+GRAY = (52,73,94)                        # Color de fondo del tablero
+WHITE = (255, 255, 255)                     # Color de las fichas del jugador 1
+BLACK =(0,0,0)                              # Color de las fichas del jugador 2
+ANCHO = (10 * TAMAÑO_CUADRO) + 300
+ALTO = 10 * TAMAÑO_CUADRO
+TAMAÑO = (ANCHO, ALTO)                      # Tamaño en pixeles del tablero
+FICHAS_INICIALES = 4                        # Numero de fichas al inicio del juego
+TOTAL_CASILLAS = FICHAS_INICIALES + 60
+
+turno = 0
+Fuente = pygame.font.SysFont('Helvetica', 30, 5)
+screen = pygame.display.set_mode(TAMAÑO)
+
+# Primero aparece el menu
+dibujar_menu()
+juego_completo()
+
+
+# Ahora aparece el resto del juego
+# Todas las patidas que se quieran jugar 
+
     
 
 pygame.quit()
+quit()
