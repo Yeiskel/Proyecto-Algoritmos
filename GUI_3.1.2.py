@@ -14,28 +14,46 @@ import pygame
 import sys
 
 def dibujar_menu():
-    TAMAÑO_MENU = (500,500)
-    screen_menu= pygame.display.set_mode(TAMAÑO_MENU)
-    over = False
     
+    over = False
     
     while not over:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                over=True
-                break
-                
-        mouse = pygame.mouse.get_pos()
-        print(mouse)
+                over=True 
+        pygame.draw.rect(screen, GRAY,(300,150,300,300),0)
         
-        if 250 + 100 > mouse[0] > 250 and 250 + 50 > mouse[1] > 100:
-            pygame.draw.rect(screen_menu, BLACK, (250,250,100,50),0)
-        else:
-            pygame.draw.rect(screen_menu, GRAY,(200,200,200,200),0)
-            pygame.draw.rect(screen_menu, GREEN, (250,250,100,50),0)
-        pygame.display.update()
         
+        #Boton de Jugar
+        boton("Jugar",400,250,100,50,BLACK, GREEN,"Jugar")
+        #Boton de Salir
+        boton("Salir", 400, 350, 100, 50, BLACK, GREEN)
+       
 
+        pygame.display.update()
+
+def boton(mensaje:str, x:int, y:int, ancho:int, alto:int, color_activo:tuple, color_inactivo:tuple, comando=None):
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    print(click)
+    if x + ancho > mouse[0] > x and y + alto > mouse[1] > y:
+            pygame.draw.rect(screen, color_activo, (x,y,ancho,alto),0)
+            if click[0] == 1 and comando != None:
+                if comando == "Jugar":
+                    pass #acá necesito llamar a todo el juego
+
+
+    else:
+            pygame.draw.rect(screen, color_inactivo, (x,y,ancho,alto),0)
+
+    textSurf, textrect = cuadros_texto(mensaje, Fuente)
+    textrect.center = ((x +(ancho/2)), y + (alto/2))
+    screen.blit(textSurf,textrect)
+
+                
+def cuadros_texto(texto:str, fuente):
+    textscreen = fuente.render(texto, True, WHITE)
+    return textscreen, textscreen.get_rect()
     
 
 def inicializar_tablero(empezar_partida:str)->'list':
@@ -122,6 +140,7 @@ def resultados(tablero:list)->str:
     else:
         print("\nEmpate")
 
+
 while True:
     try:
         empezar_partida = input("¿Desea Jugar? \n(S/N): ")
@@ -130,10 +149,10 @@ while True:
         break
     except: 
         print("Entrada no valida. Intente nuevamente")
+    
 
 tablero = inicializar_tablero(empezar_partida)
 print(visualizacion_tablero(tablero))
-
   
 pygame.init()
 
@@ -153,11 +172,13 @@ TOTAL_CASILLAS = FICHAS_INICIALES + 60
 
 
 Fuente = pygame.font.SysFont('Helvetica', 30, 5)
-dibujar_menu()
 screen = pygame.display.set_mode(TAMAÑO)
 
+# Primero aparece el menu
+dibujar_menu()
 
 
+# Ahora aparece el resto del juego
 # Todas las patidas que se quieran jugar 
 while empezar_partida=="S":
     game_over = False                              
