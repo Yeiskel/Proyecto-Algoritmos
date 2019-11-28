@@ -7,14 +7,15 @@ def dibujar_menu():
     
     while not over:
         for event in pygame.event.get():
+            mouse = pygame.mouse.get_pos()
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print("El menu se cerró")
-                over=True
+                if 400 + 100 > mouse[0] > 400 and 250 + 50 > mouse[1] > 250:
+                    print("El menu se cerró")
+                    over=True
         pygame.draw.rect(screen, GRAY,(300,150,300,300),0)
-        
         
         #Boton de Jugar
         boton("Jugar",400,250,100,50,BLACK, GREEN,juego_completo)
@@ -22,9 +23,7 @@ def dibujar_menu():
         #Boton de Salir
         boton("Salir", 400, 350, 100, 50, BLACK, GREEN,quit)
        
-
         pygame.display.update()
-
 def otra_partida():
     screen.fill(BLACK)
     over = False
@@ -46,10 +45,7 @@ def otra_partida():
         boton("Salir", 400, 350, 100, 50, BLACK, GREEN,quit)
        
 
-        pygame.display.update()
-
-
-    
+        pygame.display.update()   
 #Crea un boton con funcionabilidad 
 def boton(mensaje:str, x:int, y:int, ancho:int, alto:int, color_activo:tuple, color_inactivo:tuple, comando=None):
     mouse = pygame.mouse.get_pos()
@@ -59,20 +55,25 @@ def boton(mensaje:str, x:int, y:int, ancho:int, alto:int, color_activo:tuple, co
             pygame.draw.rect(screen, color_activo, (x,y,ancho,alto),0)
             if click[0] == 1 and comando != None:
                 comando() 
-
     else:
             pygame.draw.rect(screen, color_inactivo, (x,y,ancho,alto),0)
 
     textSurf, textrect = cuadros_texto(mensaje, Fuente)
     textrect.center = ((x +(ancho//2)), y + (alto//2))
-    screen.blit(textSurf,textrect)
-
-                
+    screen.blit(textSurf,textrect)          
 def cuadros_texto(texto:str, fuente):
     textscreen = fuente.render(texto, True, WHITE)
     return textscreen, textscreen.get_rect()
-
-        
+def cuadro_jugador(turno:int):
+    if turno==0:
+            textSurf, textrect = cuadros_texto("Jugador 1", Fuente)
+            textrect.center = ((700 +(100//2)), 300 + (100//2))
+            screen.blit(textSurf,textrect)  
+            
+    elif turno==1:
+        textSurf, textrect = cuadros_texto("Jugador 2", Fuente)
+        textrect.center = ((700 +(100//2)), 300 + (100//2))
+        screen.blit(textSurf,textrect)
     
 def inicializar_tablero()->'list':
     
@@ -80,16 +81,15 @@ def inicializar_tablero()->'list':
     # Fichas iniciales
     tablero[4][4] = tablero[5][5] = 1
     tablero[5][4] = tablero[4][5] = 2
-    return(tablero)
-    
-def visualizacion_tablero(copia_tablero:[int])->list:    
+    return(tablero)    
+def visualizacion_tablero(copia_tablero:[int])->str:    
     copia_tablero = ""
     k = 0
     while k<8:
         copia_tablero = copia_tablero + "\n" + str(tablero[k])
         k += 1  
-    return copia_tablero
-def dibujar_tablero(tablero):
+    return print(copia_tablero)
+def dibujar_tablero(tablero,turno):
     screen.fill(GRAY)
     letras = ["0","A","B","C","D","E","F","G","H", ""]
     n = 1
@@ -116,7 +116,7 @@ def dibujar_tablero(tablero):
         if f!= 0:
             screen.blit(texto2,[25,f*TAMAÑO_CUADRO +10])
             screen.blit(texto2,[560,f*TAMAÑO_CUADRO +10])
-            
+        cuadro_jugador(turno)    
         n += 1
     pygame.display.update()
 def es_valida(fila:int, columna:int, tablero:list)->bool:
@@ -126,7 +126,7 @@ def realizar_jugada(fila:int, columna:int, tablero:list, turno:int)->'void':
     if turno == 0:
         tablero[fila][columna]=1
     else:
-        tablero[fila][columna]= 2
+        tablero[fila][columna]= 2   
 def cambia_color(fila:int,columna:int):  # Novedad proximamente disponible en la actualizacion 3.1
     print(fila,columna)
     
@@ -158,23 +158,21 @@ def resultados(tablero:list)->str:
         print("\nEmpate")
     pygame.display.update()
     input()
-
 def juego_completo():
     
     game_over = False      
     turno=0                        
     contador_ficha = FICHAS_INICIALES
     tablero = inicializar_tablero()
-    dibujar_tablero(tablero)
+    dibujar_tablero(tablero,turno)
     pygame.display.update()
     
     # Un juego completo
     while not game_over:
         
         # Es un jugada
-        #while True:
-        for event in pygame.event.get():
-            #event= pygame.event.wait()
+        
+        for event in pygame.event.get():    
             if event.type == pygame.QUIT:
                 game_over=True
                 sys.exit()
@@ -281,18 +279,20 @@ def juego_completo():
                         print("\nJugada invalida. Intente nuevamente.")
                 
                 print("Turno del jugador" + str(turno))    
-                   
-       
-        
+          
+          
+
         # Visualizacion del tablero por jugada
-        
-        dibujar_tablero(tablero)
+              
+        dibujar_tablero(tablero,turno)
         # Determina cuando finaliza el juego
         if contador_ficha == TOTAL_CASILLAS:
             game_over= True
-            
-    # Visualizacion final de tablero 
-    dibujar_tablero(tablero)
+            turno=2
+    pygame.display.update()        
+    # Visualizacion final de tablero
+    visualizacion_tablero(tablero) 
+    dibujar_tablero(tablero,turno)
     # Muestra los resultados y el ganador
     print("Fichas iniciales: ",FICHAS_INICIALES)
     print("Total casillas: ",TOTAL_CASILLAS)
@@ -302,7 +302,7 @@ def juego_completo():
     
     
 tablero = inicializar_tablero()
-print(visualizacion_tablero(tablero))
+visualizacion_tablero(tablero)
   
 pygame.init()
 pygame.display.set_caption("Reversi".center(270))
@@ -324,9 +324,6 @@ screen = pygame.display.set_mode(TAMAÑO)
 
 dibujar_menu()
 otra_partida()
-
-
-
 
 # Todas las patidas que se quieran jugar 
 
