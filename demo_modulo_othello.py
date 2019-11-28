@@ -65,7 +65,7 @@ while True:
 
 # Constantes inicializadas
 TAMAÑO=5                       # Tamaño del tablero
-TURNOS=3                       # Cantidad de turnos a jugar
+TURNOS=2                       # Cantidad de turnos a jugar
 
 
 adversario = adversario(jugador)                                # Determina quien es el jugador adversario en funcion del jugador actual
