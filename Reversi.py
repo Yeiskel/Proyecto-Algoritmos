@@ -1,7 +1,6 @@
 import pygame
 import sys
 from random import randint
-import time
 #-------ULTIMAS FUNCIONES AGREGADAS-----------#
 
 def ayuda():
