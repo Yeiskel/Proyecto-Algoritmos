@@ -1,8 +1,18 @@
+# Autores: Yeiskel Cisneros 14-10223
+#           Gerardo Carrillo 15-11662
 import pygame
 import sys
 from random import randint
 #-------ULTIMAS FUNCIONES AGREGADAS-----------#
 
+def trad_num_letra(num:int)->str:
+    try:
+        assert(1<=num<9)
+    except:
+        print("Error en la asercion de la funcion trad_num_letra()")
+    letra=[-1,"A","B","C","D","E","F","G","H"]
+    resp=letra[num]
+    return resp
 def ayuda():
     print("T: Visualizar tablero \nR: Ver jugadas validas \nJ: Ver jugador \nQ: Ayuda \n****************************** ")
 def simulador(tablero:list, turno:int, fila:int, columna:int)->bool:
@@ -50,7 +60,7 @@ def mov_posibles(copia_tablero:list, turno:int, mensaje:bool)->int:
             if temp==True:
                 mov_posibles+=1
                 if mensaje==True:
-                    print(f"Tablero[{fila}][{columna}]={temp}")
+                    print(f"Tablero[{trad_num_letra(columna)}][{fila}]={temp}")
     if mensaje==True:
         print(f"mov. posibles para el jugador {jugador} =", mov_posibles, end="\n\n")
     return mov_posibles        
@@ -92,7 +102,7 @@ def diferencia_listas(y:list, x:list)->list:
     for k in range(len(x)):
         y=elimina_num_lista(y,x[k])
     return y
-def consumo_fichas(tablero:list, turno:int, fila:int, columna:int)->list:
+def consumo_fichas(tablero:list, turno:int, fila:int, columna:int)->list:       # Permite consumir las fichas al ser flanqueadas
     try:
         if turno==0:
             jugador=1        # Turno 0/Jugador 1/negras
@@ -132,21 +142,12 @@ def consumo_fichas(tablero:list, turno:int, fila:int, columna:int)->list:
             recorrido.append(casilla)
             #------------------------------------------------------------
             tablero[pos_f][pos_c]=jugador
-            print(f"Recorrido({direccion[f][0]},{direccion[f][1]}): [{pos_f}],[{pos_c}]")
+            print(f"Recorrido({direccion[f][0]},{direccion[f][1]}): [{trad_num_letra(pos_c)}],[{pos_f}]")
             pos_f=pos_f + temp_f
             pos_c=pos_c + temp_c
         if 0<pos_f<9 and 0<pos_c<9 and tablero[pos_f][pos_c]==jugador:
             if pos_f!=fila+1 and pos_f!=fila-1 and pos_c!=columna+1 and pos_c!=columna-1:
                 estado=True
-            #print("-----------------------------------")
-            #print(f"fila+1= {fila+1}, columna+1= {columna+1}")
-            #print(f"fila-1= {fila-1}, columna-1= {columna-1}")
-            #print(f"pos_f= {pos_f}, pos_c= {pos_c}")
-            #print(f"pos_f!=fila+1: {pos_f!=fila+1}, pos_c!=columna+1: {pos_c!=columna+1}")
-            #print(f"pos_f!=fila-1: {pos_f!=fila-1}, pos_c!=columna-1: {pos_c!=columna-1}")
-            #print(f"tablero[pos_f][pos_c]={tablero[pos_f][pos_c]}")
-            #print(f"estado= {estado}")
-            #print("-----------------------------------")
         else:
             pos_f = fila+temp_f
             pos_c = columna+temp_c
@@ -168,12 +169,12 @@ def consumo_fichas(tablero:list, turno:int, fila:int, columna:int)->list:
     consumo=diferencia_listas(recorrido, correcion)
     
     for i in range(len(consumo)):
-        print(f"Consumo({consumo[i][0]},{consumo[i][1]}): [{consumo[i][2]}],[{consumo[i][3]}]")
+        print(f"Consumo({consumo[i][0]},{consumo[i][1]}): [{trad_num_letra(consumo[i][3])}],[{consumo[i][2]}]")
     # visualizacion_tablero(consumo)
     estado_tablero=[estado, tablero]
     return estado_tablero
 #------------REPRESENTACION GRAFICA -----------#
-def dibujar_menu():                 
+def dibujar_menu():     # Despliega el menú de inicio del juego               
     over = False
     while not over:
         for event in pygame.event.get():
@@ -181,20 +182,26 @@ def dibujar_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if 400 + 100 > mouse[0] > 400 and 250 + 50 > mouse[1] > 250:
-                    print("El menu se cerró")
                     over=True
+
+        pygame.draw.rect(screen, LIGHT_BLUE,(250,100,400,400),15)
+        pygame.draw.rect(screen, LIGHT_BLUE,(275,125,350,350),10)            
         pygame.draw.rect(screen, GRAY,(300,150,300,300),0)
         dibujar_cuadros_texto("REVERSI", 400, 170, 100, 50, fuente, GREEN)
         
         #Boton de Jugar
-        boton("Jugar",400,250,100,50,BLACK, GREEN,juego_completo)
+        boton("Jugar",400,250,100,50,BLACK, LIGHT_BLUE,juego_completo)
         #Boton de Salir
-        boton("Salir", 400, 350, 100, 50, BLACK, GREEN,quit)
+        boton("Salir", 400, 350, 100, 50, BLACK, LIGHT_BLUE,quit)
         
         pygame.display.update()      
-def otra_partida():                 
+def otra_partida():     # Permite jugar una nueva partida                 
     over = False
     while not over:
         for event in pygame.event.get():
@@ -204,13 +211,13 @@ def otra_partida():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 over=True
         
-        #Boton de Jugar
+        #Boton de Jugar de nuevo
         boton("Jugar de nuevo",620,150,250,50,BLACK, GREEN,juego_completo)
         #Boton de Salir
         boton("Salir", 700, 225, 100, 50, BLACK, GREEN,quit)
        
         pygame.display.update()    
-def boton(mensaje:str, x:int, y:int, ancho:int, alto:int, color_activo:tuple, color_inactivo:tuple, comando=None):  
+def boton(mensaje:str, x:int, y:int, ancho:int, alto:int, color_activo:tuple, color_inactivo:tuple, comando=None):  #Crea botones funcionales 
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
@@ -221,24 +228,30 @@ def boton(mensaje:str, x:int, y:int, ancho:int, alto:int, color_activo:tuple, co
     else:
             pygame.draw.rect(screen, color_inactivo, (x,y,ancho,alto),0)
     dibujar_cuadros_texto(mensaje, x, y, ancho, alto, fuente, WHITE)          
-def dibujar_cuadros_texto(mensaje:str, x:int, y:int, ancho:int, alto:int, fuente, color:tuple):
+def dibujar_cuadros_texto(mensaje:str, x:int, y:int, ancho:int, alto:int, fuente, color:tuple): #Permite visualizar texto dentro del juego
     textscreen = fuente.render(mensaje, True, color)
     textSurf = textscreen
     textrect = textscreen.get_rect()
     textrect.center = ((x +(ancho//2)), y + (alto//2))
     screen.blit(textSurf,textrect)  
-def cuadro_jugador(turno:int):
+def cuadro_jugador(turno:int):  #Muestra el turno y nombre del jugador
     if turno==0:
         dibujar_cuadros_texto("Turno de " + jugador_1, 700, 100, 100, 100, fuente, BLACK)
     elif turno==1:
         dibujar_cuadros_texto("Turno de " + jugador_2, 700, 100, 100, 100, fuente, WHITE)
-def jugada_invalida(invalida:bool):
+def jugada_invalida(invalida:bool):     #Mensaje de error ante una jugada inválida
     if invalida== True:
             dibujar_cuadros_texto("Jugada inválida", 700, 150, 100, 100, fuente, RED)
             dibujar_cuadros_texto("Intente nuevamente", 700, 200, 100, 100, fuente, RED)
     else:
+        pass
+def instrucciones(game_over):   #Especifica la forma en que se debe ingresar las entradas del teclado
+    if game_over == False:
+        dibujar_cuadros_texto("Ingrese una letra", 700, 250, 100, 100, fuente, LIGHT_GRAY)
+        dibujar_cuadros_texto("y luego un número", 700, 300, 100, 100, fuente, LIGHT_GRAY)
+    elif game_over == True:
         pass  
-def dibujar_tablero(tablero:list ,turno:int, invalida:bool, game_over:bool):
+def dibujar_tablero(tablero:list ,turno:int, invalida:bool, game_over:bool):    #Dibuja el tablero con todos sus elementos sobre la interfaz
     screen.fill(GRAY)
     letras = ["0","A","B","C","D","E","F","G","H", ""]
     n = 1
@@ -266,16 +279,18 @@ def dibujar_tablero(tablero:list ,turno:int, invalida:bool, game_over:bool):
             screen.blit(texto2,[25,f*TAMAÑO_CUADRO +10])
             screen.blit(texto2,[560,f*TAMAÑO_CUADRO +10])
         cuadro_jugador(turno)
-        jugada_invalida(invalida)               
+        jugada_invalida(invalida)
+        instrucciones(game_over)
+
         n += 1
     if game_over == True:   # parametro 828
             for k in range(50):
-                resultados(tablero, (828-50)+k) # Muestra los resultados y el ganador
-            otra_partida()      # Permite jugar una nueva partida
+                resultados(tablero, (828-50)+k) 
+            otra_partida()      
     else:
         pass 
     pygame.display.update()
-def tablero_consola(tablero:[int])->str:    
+def tablero_consola(tablero:[int])->str:    # Muestra en consola la matriz de forma ordenada     
     copia_tablero = ""
     k = 0
     while k<8:
@@ -289,13 +304,13 @@ def inicializar_tablero()->list:
     tablero[4][4] = tablero[5][5] = 1
     tablero[5][4] = tablero[4][5] = 2
     return(tablero)    
-def es_valida(copia_tablero:list, tablero:list, turno:int, fila:int, columna:int)->bool:
-    print(f"\nPosicion jugada= [{fila}][{columna}]")
+def es_valida(copia_tablero:list, tablero:list, turno:int, fila:int, columna:int)->bool:    # Verifica que una jugada es válida 
+    print(f"\nPosicion jugada= [{trad_num_letra(columna)}],[{fila}]")
     estado_tablero=consumo_fichas(copia_tablero, turno, fila, columna)
     respuesta = (0<fila and fila<9) and (0<columna and columna<9) and copia_tablero[fila][columna]==0 and estado_tablero[0]
     copia_tablero=tablero[:]
     return respuesta
-def realizar_jugada(copia_tablero:list, turno:int, fila:int, columna:int)->'void':  
+def realizar_jugada(copia_tablero:list, turno:int, fila:int, columna:int)->'void':      # Modifica la matriz con la jugada deseada  
     try:
         if turno == 0:
             copia_tablero[fila][columna]=1
@@ -307,13 +322,13 @@ def realizar_jugada(copia_tablero:list, turno:int, fila:int, columna:int)->'void
         print("Error en la asercion de la funcion realizar_jugada(), valores: ")
         print("copia_tablero[fila][columna]=", copia_tablero,",turno=",turno)
         sys.exit()         
-def cambiar_turno(turno:int)->int:
+def cambiar_turno(turno:int)->int:      #Alterna los turnos de los jugadores
     if turno==0:
         turno=1        # Jugador 2/blancas
     else:
         turno=0        # Jugador 1/negras
     return turno
-def resultados(tablero:list, par_mov:int)->str:
+def resultados(tablero:list, par_mov:int)->str:     # Muestra los resultados y el ganador
     fichas_negras = contador_fichas(tablero, 1) 
     fichas_blancas = contador_fichas(tablero, 2)
     print("\nEl numero de fichas del jugador 1 es: " +str(fichas_negras))
@@ -361,15 +376,18 @@ def juego_completo():
         for event in pygame.event.get():   
             if event.type == pygame.QUIT:
                 game_over=True
-                sys.exit()
+                pygame.quit()
+                quit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    sys.exit()
-                
+                    pygame.quit()
+                    quit()
+
                 if defecto%2==0:      
                     columna = -1        # Valor por defecto de la variable columna     
                 else:
                     pass
+
                 if event.key == pygame.K_a: #columnas
                     columna = 1
                     defecto += 1
@@ -404,7 +422,7 @@ def juego_completo():
                 elif event.key == pygame.K_q:
                     ayuda()
 
-                if event.key == pygame.K_1: #filas
+                if event.key == pygame.K_1 or event.key == pygame.K_KP1: #filas
                     fila = 1
                     if  columna!=-1 and es_valida(copia_tablero, tablero, turno, fila, columna):
                         realizar_jugada(copia_tablero, turno, fila, columna)
@@ -420,7 +438,7 @@ def juego_completo():
                         invalida= True
                         defecto=0
                         pygame.display.update()
-                elif event.key == pygame.K_2:
+                elif event.key == pygame.K_2 or event.key == pygame.K_KP2:
                     fila = 2
                     if  columna!=-1 and es_valida(copia_tablero, tablero, turno, fila, columna):
                         realizar_jugada(copia_tablero, turno, fila, columna)
@@ -435,7 +453,7 @@ def juego_completo():
                         print(f"Error, fila= {fila}, columna= {columna}")
                         invalida= True
                         defecto=0
-                elif event.key == pygame.K_3:
+                elif event.key == pygame.K_3 or event.key == pygame.K_KP3:
                     fila = 3
                     if  columna!=-1 and es_valida(copia_tablero, tablero, turno, fila, columna):
                         realizar_jugada(copia_tablero, turno, fila, columna)
@@ -450,7 +468,7 @@ def juego_completo():
                         print(f"Error, fila= {fila}, columna= {columna}")
                         invalida= True
                         defecto=0
-                elif event.key == pygame.K_4:
+                elif event.key == pygame.K_4 or event.key == pygame.K_KP4:
                     fila = 4
                     if  columna!=-1 and es_valida(copia_tablero, tablero, turno, fila, columna):
                         realizar_jugada(copia_tablero, turno, fila, columna)
@@ -465,7 +483,7 @@ def juego_completo():
                         print(f"Error, fila= {fila}, columna= {columna}")
                         invalida= True
                         defecto=0
-                elif event.key == pygame.K_5:
+                elif event.key == pygame.K_5 or event.key == pygame.K_KP5:
                     fila = 5
                     if  columna!=-1 and es_valida(copia_tablero, tablero, turno, fila, columna):
                         realizar_jugada(copia_tablero, turno, fila, columna)
@@ -480,7 +498,7 @@ def juego_completo():
                         print(f"Error, fila= {fila}, columna= {columna}")
                         invalida= True
                         defecto=0
-                elif event.key == pygame.K_6:
+                elif event.key == pygame.K_6 or event.key == pygame.K_KP6:
                     fila = 6
                     if  columna!=-1 and es_valida(copia_tablero, tablero, turno, fila, columna):
                         realizar_jugada(copia_tablero, turno, fila, columna)
@@ -495,7 +513,7 @@ def juego_completo():
                         print(f"Error, fila= {fila}, columna= {columna}")
                         invalida= True
                         defecto=0
-                elif event.key == pygame.K_7:
+                elif event.key == pygame.K_7 or event.key == pygame.K_KP7:
                     fila = 7
                     if  columna!=-1 and es_valida(copia_tablero, tablero, turno, fila, columna):
                         realizar_jugada(copia_tablero, turno, fila, columna)
@@ -510,7 +528,7 @@ def juego_completo():
                         print(f"Error, fila= {fila}, columna= {columna}")
                         invalida= True
                         defecto=0
-                elif event.key == pygame.K_8:
+                elif event.key == pygame.K_8 or event.key == pygame.K_KP8:
                     fila = 8
                     if  columna!=-1 and es_valida(copia_tablero, tablero, turno, fila, columna):
                         realizar_jugada(copia_tablero, turno, fila, columna)
@@ -529,17 +547,13 @@ def juego_completo():
         if mov_posibles(tablero, turno, False)==0:
             turno=cambiar_turno(turno)
             print("El jugador actual no tiene movimientos validos, debe mover el otro jugador")        
-                
-                       
-                
+                        
         # Visualizacion del tablero por jugada    
         dibujar_tablero(tablero,turno, invalida, game_over)
         # Determina cuando finaliza el juego
-        
         if contador_fichas(tablero, 0)==0 or (mov_posibles(tablero, 0, False)==0 and mov_posibles(tablero, 1, False)==0):
             game_over= True
             turno=2
-            
     pygame.display.update()        
     # Visualizacion final de tablero
     tablero_consola(tablero)
@@ -548,16 +562,15 @@ def juego_completo():
     print("Total casillas: ",TOTAL_CASILLAS) 
     dibujar_tablero(tablero,turno, invalida, game_over)
   
-
 pygame.init()
-pygame.display.set_caption("Reversi".center(270))
+pygame.display.set_caption("REVERSI".center(270))   #Titulo del juego en la ventana
 
 # CONSTANTES INICIALIZADAS 
 TAMAÑO_CUADRO = 60  
 GREEN =(67,160,71)      
 BLUE = (42,17,204)
-RED = (255,128,0)   #Realmente es naranja, lo sé. 
-# RED = (255,0,128)                    
+LIGHT_BLUE = (50,141,216)
+RED = (255,128,0)                        
 GRAY = (38,53,69)
 LIGHT_GRAY = (192,192,192)
 DARK_GRAY = (128,128,128)                                             
@@ -570,10 +583,15 @@ TAMAÑO = (ANCHO, ALTO)                                # Tamaño en pixeles del 
 FICHAS_INICIALES = 4                                  # Numero de fichas al inicio del juego
 TOTAL_CASILLAS = FICHAS_INICIALES + 60
 fuente = pygame.font.SysFont('Helvetica', 30, 5)      # Configuracion de la fuente usada en el juego
-jugador_1 = input('Ingrese el nombre del jugador 1: ')  #Ingreso de los nombres de los jugadores
-jugador_2 = input('Ingrese el nombre del jugador 2: ')
+while True:
+    try:
+        jugador_1 = input('Ingrese el nombre del jugador 1: ')  #Ingreso de los nombres de los jugadores
+        jugador_2 = input('Ingrese el nombre del jugador 2: ')
+        assert(len(jugador_1) < 10 and len(jugador_2) < 10)
+        break
+    except:
+        print("Los nombres deben constar de menos de 10 caracteres. Intente de nuevo")
 screen = pygame.display.set_mode(TAMAÑO)              # Configuracion inicial de la ventana de juego
 
 dibujar_menu()           # Representacion grafica del menu con las opciones JUGAR/SALIR                               
 
-pygame.quit()
